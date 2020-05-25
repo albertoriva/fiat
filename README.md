@@ -40,3 +40,5 @@ sequence, its length, the range of bases currently visible, the number of define
 and the number of hits (see Regions and Searching below).
 
 * The last row is the /message/ row. It is used to display messages or to accept user input.
+
+See ![demo screenshot](demo/screenshot.png).
