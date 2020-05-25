@@ -35,10 +35,12 @@ by an empty line.
 of each line is: position of the first base in the line, 60 bases, and optionally the name
 of all hits and all regions present in the line.
 
-* The last-but-one row is the status row. It displays the name of the currently displayed
+* The last-but-one row (in reverse) is the status row. It displays the name of the currently displayed
 sequence, its length, the range of bases currently visible, the number of define regions
 and the number of hits (see Regions and Searching below).
 
 * The last row is the /message/ row. It is used to display messages or to accept user input.
 
-See ![demo screenshot](demo/screenshot.png).
+The following image shows an example of what the display looks like:
+
+![demo screenshot](demo/screenshot.png)
