@@ -44,3 +44,8 @@ and the number of hits (see Regions and Searching below).
 The following image shows an example of what the display looks like:
 
 ![demo screenshot](demo/screenshot.png)
+
+## Usage
+
+When displaying a sequence, use the '?' key to display all available commands.
+

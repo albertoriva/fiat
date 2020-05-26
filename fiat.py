@@ -466,7 +466,8 @@ class Sequence(object):
             self.showMessage(win, "Error: search sequence contains invalid nucleotides (allowed: {})".format(VALIDBASES))
             return
         self.findMatches(target)
-
+        self.status = "{} hits found.".format(len(self.hits))
+        
     def nextHit(self, win):
         nh = len(self.hits)
         if nh == 0:
@@ -551,7 +552,7 @@ class Sequence(object):
             self._focus = None
             
     def hitToRegion(self, win):
-        color = askColor(win)
+        color = self.askColor(win)
         self.hits.remove(self._focus)
         self.regions.append(self._focus)
         self._focus.color = color
@@ -719,7 +720,7 @@ class Driver(object):
         (h, w) = win.getmaxyx()
         win.move(0, 0)
         win.erase()
-        win.addstr(1, 1, "FIAT - FASTA In A Terminal", curses.color_pair(4))
+        win.addstr(1, 1, "FIAT - FASTA In A Terminal", curses.color_pair(4) + curses.A_BOLD)
         win.addstr(3, 0, text)
         if footer:
             win.addstr(h-2, 0, footer)
@@ -728,15 +729,15 @@ class Driver(object):
     
     def showHelp(self, win):
         a = self.showHelp1(win)
-        if a == 'q':
+        if a == ord('q'):
             return
         a = self.showHelp2(win)
-        if a == 'q':
+        if a == ord('q'):
             return
         a = self.showHelp3(win)
 
     def showHelp1(self, win):
-        self.showHelpPage(win, """
+        return self.showHelpPage(win, """
         FIAT displays one or more FASTA sequences in a terminal window. The sequence
         is displayed across the whole height of the terminal except for the top three
         lines (used for coordinates) and the bottom two. The last-but-one row (in
@@ -746,7 +747,7 @@ class Driver(object):
         The last line (the `message' line) is used to display transient information or
         to get use input.
 
-Basic commands:
+ Basic commands:
 
         Up, Down    - scroll one line backwards / forward
         Left, Right - scroll 10 lines backwards / forward
@@ -762,7 +763,7 @@ Basic commands:
         D           - delete all regions
         q           - quit
 
-When displaying options:
+ When displaying options:
 
         m           - set maximum number of mismatches in search
         s           - set search mode - any subset of the following:
@@ -771,7 +772,7 @@ When displaying options:
         """, "Press q to exit help, any other key for next page (Regions).")
 
     def showHelp2(self, win):
-        self.showHelpPage(win, """Regions
+        return self.showHelpPage(win, """Regions
 
         Regions are arbitrary subsequences characterized by a start and end position,
         a name, and a color. Regions can be defined manually (using the `a' key) or
@@ -790,7 +791,7 @@ When displaying options:
         """, "Press q to exit help, any other key for next page (Searching).")
 
     def showHelp3(self, win):
-        self.showHelpPage(win, """Searching
+        return self.showHelpPage(win, """Searching
 
         The search command finds all occurrences of a specified pattern (hits). Hits are
         displayed in black on yellow in the sequence, and their names are displayed in
