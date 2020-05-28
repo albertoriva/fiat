@@ -10,8 +10,6 @@ if sys.version_info.major == 2:
 else:
     wrapper = curses.wrapper
 
-from BIutils import BItext
-
 __doc__       = "Text-mode browser for DNA sequences"
 __author__    = "Alberto Riva"
 __version__   = "0.9"
@@ -466,7 +464,7 @@ class Sequence(object):
             self.showMessage(win, "Error: search sequence contains invalid nucleotides (allowed: {})".format(VALIDBASES))
             return
         self.findMatches(target)
-        self.status = "{} hits found.".format(len(self.hits))
+        self.status = "Search: {} hits found.".format(len(self.hits))
         
     def nextHit(self, win):
         nh = len(self.hits)
