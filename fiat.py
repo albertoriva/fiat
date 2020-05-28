@@ -423,7 +423,7 @@ class Sequence(object):
         finally:
             curses.curs_set(0)
             curses.noecho()
-        return r
+        return r.decode('utf-8')
 
     def askColor(self, win):
         col = self.askString(win, "Color (r,g,b,c,m): ")
