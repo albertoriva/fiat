@@ -47,5 +47,41 @@ The following image shows an example of what the display looks like:
 
 ## Usage
 
-When displaying a sequence, use the '?' key to display all available commands.
+When displaying a sequence, use the '?' key to display all available commands. Use the 'q' command
+to quit the program.
 
+## Basic commands
+
+You can use the arrow keys, Home/End, PgUp/PgDn, Enter and Spacebar to navigate through the sequence.
+Left arrow scrolls back by 10 lines, right arrow scrolls forward by 10 lines.
+
+The 'g' key (for 'go to') asks for a position in the sequence, and scrolls the display so that the
+line containing that position is at the top of the screen.
+
+The 's' key prints some statistics on the sequence in the message row. Currently these consists of
+the counts and percentages for each base, and the GC%.
+
+The 'o' key is used to set options. Currently these are:
+* The maximum number of mismatches allowed in a search (with the 'm' key);
+* The search mode (with the 's' key) - this can be any combination of the four letters f, r, c, d,
+  meaning forward, reverse, complement, and reverse-complement respectively. For example, if the mode
+  is 'fr' the program will search for sequences in both forward and reverse orientations. See the Searching
+  section for more details. 
+
+## Regions
+
+Regions are arbitrary subsequences characterized by a start and end position,
+a name, and a color. Regions can be defined manually (using the `a' key) or
+as a result of a search. Use < and > to focus the previous / next region
+respectively. When a region is focused, the message line starts with `* Region'
+and shows the number of the current region and its coordinates.
+
+Key | Command
+----|--------
+        <, >         | jump to previous / next region
+        r            | rename the currently focused region
+        c            | change color of the currently focused region
+        d            | delete the currently focused region
+
+The following five colors can be used for regions, identified by their initial:
+(r)ed, (g)reen, (b)lue, (m)agenta, (c)yan

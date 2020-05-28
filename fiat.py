@@ -781,7 +781,7 @@ class Driver(object):
         Home, End   - go to beginning / end of sequence
         g           - jump to specified position
         s           - display sequence statistics
-        o           - display options
+        o           - display options (see below)
         n, p        - switch to next / previous sequence
         /           - search for patterns
         a           - add a region
@@ -791,7 +791,7 @@ class Driver(object):
  When displaying options:
 
         m           - set maximum number of mismatches in search
-        s           - set search mode - any subset of the following:
+        s           - set search mode - any combination of the following:
                         f = forward, r = reverse, c = complement, d = reverse complement
 
         """, "Press q to exit help, any other key for next page (Regions).")
