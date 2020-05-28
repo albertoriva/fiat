@@ -72,7 +72,7 @@ The `o` key is used to set options. Currently these are:
 
 Regions are arbitrary subsequences characterized by a start and end position,
 a name, and a color. Regions can be defined manually (using the `a` key) or
-as a result of a search. Use < and > to focus the previous / next region
+as a result of a search. Use `<` and `>` to focus the previous / next region
 respectively. When a region is focused, the message line starts with `* Region`
 and shows the number of the current region and its coordinates.
 
@@ -113,7 +113,7 @@ followed by `s`), which can be any combination of the following:
 
 For example, if the search mode is fd, GATTA will match both GATTA and TAATC.
 
-Use , and . to focus the previous / next hit respectively. When a hit is focused, 
+Use `,` and `.` to focus the previous / next hit respectively. When a hit is focused, 
 the message line starts with `* Hit` and shows the number of the current hit, its 
 coordinates, and its orientation.
 
