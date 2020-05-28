@@ -114,7 +114,7 @@ followed by 's'), which can be any subset of the following:
 For example, if the search mode is fd, GATTA will match both GATTA and TAATC.
 
 Use , and . to focus the previous / next hit respectively. When a hit is focused, 
-the message line starts with '* Hit' and shows the number of the current hit, its 
+the message line starts with `* Hit` and shows the number of the current hit, its 
 coordinates, and its orientation.
 
 Key | Function
