@@ -845,7 +845,7 @@ class Driver(object):
         the message line starts with `* Hit' and shows the number of the current hit, its 
         coordinates, and its orientation.
 
-        .            - jump to hte previous hit
+        .            - jump to the previous hit
         ,            - jump to the next hit
         a            - save this hit as a region (prompts for name and color)
         A            - save all hits as regions (prompts for color)
