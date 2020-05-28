@@ -152,6 +152,7 @@ class Sequence(object):
     searchmode = "f"
     mismatches = 0
     stats = {}
+    frequencies = {}
     status = None
     _focus = None               # Hit or region being displayed
     _focustype = ""             # 'h' or 'r'
@@ -189,6 +190,25 @@ class Sequence(object):
     def calcStats(self):
         for b in "ACGT":
             self.stats[b] = self.seq.count(b)
+        pA = 1.0 * self.stats['A'] / self.seqlen
+        pC = 1.0 * self.stats['C'] / self.seqlen
+        pG = 1.0 * self.stats['G'] / self.seqlen
+        pT = 1.0 * self.stats['T'] / self.seqlen
+        self.frequencies['A'] = pA
+        self.frequencies['C'] = pC
+        self.frequencies['G'] = pG
+        self.frequencies['T'] = pT
+        self.frequencies['K'] = pG+pT
+        self.frequencies['Y'] = pC+pT
+        self.frequencies['S'] = pC+pG
+        self.frequencies['W'] = pA+pT
+        self.frequencies['R'] = pA+pG
+        self.frequencies['M'] = pA+pC
+        self.frequencies['B'] = pC+pG+pT
+        self.frequencies['D'] = pA+pG+pT
+        self.frequencies['H'] = pA+pC+pT
+        self.frequencies['V'] = pA+pC+pG
+        self.frequencies['N'] = 1.0
     
     def validRow(self, r):
         if r < 0:
@@ -450,7 +470,13 @@ class Sequence(object):
         if r <= 0 or r > self.seqlen:
             return
         self._row = self.validRow(r / 60 + delta)
-        
+
+    def sequenceProb(self, seq):
+        p = 1.0
+        for b in seq:
+            p = p * self.frequencies[b]
+        return p
+    
     def doSearch(self, win):
         target = self.askString(win, "Search: ")
         if not target:
@@ -464,7 +490,8 @@ class Sequence(object):
             self.showMessage(win, "Error: search sequence contains invalid nucleotides (allowed: {})".format(VALIDBASES))
             return
         self.findMatches(target)
-        self.status = "Search: {} hits found.".format(len(self.hits))
+        tprob = self.sequenceProb(target)
+        self.status = "Search: {} hits found (expected: {}).".format(len(self.hits), int(tprob * self.seqlen))
         
     def nextHit(self, win):
         nh = len(self.hits)
