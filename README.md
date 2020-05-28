@@ -76,6 +76,11 @@ as a result of a search. Use `<` and `>` to focus the previous / next region
 respectively. When a region is focused, the message line starts with `* Region`
 and shows the number of the current region and its coordinates.
 
+If you use the `a` key to enter a region manually, the program will prompt for the
+region coordinates, its name, and its color (red by default). Coordinates can be entered
+in one of two formats: `start-end`, or `start+length`. For example, `1000-1500` and `1000+500`
+indicate the same region.
+
 Key | Command
 ----|--------
 <, >         | jump to previous / next region
