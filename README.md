@@ -71,17 +71,17 @@ The 'o' key is used to set options. Currently these are:
 ## Regions
 
 Regions are arbitrary subsequences characterized by a start and end position,
-a name, and a color. Regions can be defined manually (using the `a' key) or
+a name, and a color. Regions can be defined manually (using the 'a' key) or
 as a result of a search. Use < and > to focus the previous / next region
-respectively. When a region is focused, the message line starts with `* Region'
+respectively. When a region is focused, the message line starts with '* Region'
 and shows the number of the current region and its coordinates.
 
 Key | Command
 ----|--------
-        <, >         | jump to previous / next region
-        r            | rename the currently focused region
-        c            | change color of the currently focused region
-        d            | delete the currently focused region
+<, >         | jump to previous / next region
+r            | rename the currently focused region
+c            | change color of the currently focused region
+d            | delete the currently focused region
 
 The following five colors can be used for regions, identified by their initial:
 (r)ed, (g)reen, (b)lue, (m)agenta, (c)yan
