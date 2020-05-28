@@ -88,40 +88,40 @@ The following five colors can be used for regions, identified by their initial:
 
 ## Searching
 
-        The search command finds all occurrences of a specified pattern (hits). Hits are
-        displayed in black on yellow in the sequence, and their names are displayed in
-        yellow. The name of a search hit is automatically generated and cannot be changed. 
+The search command finds all occurrences of a specified pattern (hits). Hits are
+displayed in black on yellow in the sequence, and their names are displayed in
+yellow. The name of a search hit is automatically generated and cannot be changed. 
 
-        The pattern can be specified using the full IUPAC nucleotide alphabet, shown here:
+The pattern can be specified using the full IUPAC nucleotide alphabet, shown here:
 
 ```
-        A      K = G/T       B = C/G/T
-        C      Y = C/T       D = A/G/T
-        G      S = C/G       H = A/C/T
-        T      W = A/T       V = A/C/G
-               R = A/G
-               M = A/C       N = A/C/G/T
+A      K = G/T       B = C/G/T
+C      Y = C/T       D = A/G/T
+G      S = C/G       H = A/C/T
+T      W = A/T       V = A/C/G
+       R = A/G
+       M = A/C       N = A/C/G/T
 ```
 
-        For example, the pattern CAST will match CACT or CAGT.
+For example, the pattern CAST will match CACT or CAGT.
 
-        Matching is also affected by the maximum number of mismatches allowed (that can be
-        set using the 'o' command followed by 'm') and by the search mode (set with 'o'
-        followed by 's'), which can be any subset of the following:
+Matching is also affected by the maximum number of mismatches allowed (that can be
+set using the 'o' command followed by 'm') and by the search mode (set with 'o'
+followed by 's'), which can be any subset of the following:
 
-          f = forward, r = reverse, c = complement, d = reverse complement
-        
-        For example, if the search mode is fd, GATTA will match both GATTA and TAATC.
+  f = forward, r = reverse, c = complement, d = reverse complement
 
-        Use , and . to focus the previous / next hit respectively. When a hit is focused, 
-        the message line starts with '* Hit' and shows the number of the current hit, its 
-        coordinates, and its orientation.
+For example, if the search mode is fd, GATTA will match both GATTA and TAATC.
+
+Use , and . to focus the previous / next hit respectively. When a hit is focused, 
+the message line starts with '* Hit' and shows the number of the current hit, its 
+coordinates, and its orientation.
 
 Key | Function
 ----|---------
-.            | jump to the previous hit
-,            | jump to the next hit
-a            | save this hit as a region (prompts for name and color)
-A            | save all hits as regions (prompts for color)
+.    | jump to the previous hit
+,    | jump to the next hit
+a    | save this hit as a region (prompts for name and color)
+A    | save all hits as regions (prompts for color)
 
-        To clear the list of hits, enter `-' as the search string.
+To clear the list of hits, enter `-' as the search string.
