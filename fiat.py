@@ -115,14 +115,13 @@ def parseCoords(c):
         if "-" in c:
             [a, b] = c.split("-")
             return [int(a), int(b)]
-        elif "+" in c:
+        if "+" in c:
             [a, b] = c.split("+")
             return [int(a), int(a) + int(b)]
-        else:
-            return [False, False]
+        return [False, False]
     except ValueError:
         return [False, False]
-    
+
 class Region(object):
     seq = ""
     regname = ""
@@ -140,7 +139,7 @@ class Region(object):
         else:
             self.regname = "{}_{}_{}".format(prefix, start, end)
         self.color = color
-    
+
 class Sequence(object):
     fastafile = ""
     seq = ""
@@ -166,25 +165,32 @@ class Sequence(object):
         self.regions = []
         self.hits = []
 
-    def load(self, fastafile):
-        self.fastafile = fastafile
-        with open(fastafile, "r") as f:
-            hdr = f.readline()
-            (fmt, seqname) = detectFormat(hdr)
-            if fmt == 'fasta':
-                self.loadFasta(f)
-                self.seqname = seqname
-            elif fmt == 'gb':
-                self.loadGenbank(f)
-                self.seqname = seqname
-            else:
-                sys.stderr.write("Malformed FASTA file - cannot load.\n")
-                return False
-        self.seqlen = len(self.seq)
-        self._nrows = 1 + self.seqlen / 60
-        self.calcStats()
-        sys.stderr.write("Sequence {} loaded, {}bp.\n".format(self.seqname, self.seqlen))
-        return True
+    def isFocus(self, ftype):
+        return self._focus and (self._focustype == ftype)
+
+    def setFocus(self, ftype, what):
+        self._focus = what
+        self._focustype = ftype
+    
+    # def load(self, fastafile):
+    #     self.fastafile = fastafile
+    #     with open(fastafile, "r") as f:
+    #         hdr = f.readline()
+    #         (fmt, seqname) = detectFormat(hdr)
+    #         if fmt == 'fasta':
+    #             self.loadFasta(f)
+    #             self.seqname = seqname
+    #         elif fmt == 'gb':
+    #             self.loadGenbank(f)
+    #             self.seqname = seqname
+    #         else:
+    #             sys.stderr.write("Malformed FASTA file - cannot load.\n")
+    #             return False
+    #     self.seqlen = len(self.seq)
+    #     self._nrows = 1 + self.seqlen / 60
+    #     self.calcStats()
+    #     sys.stderr.write("Sequence {} loaded, {}bp.\n".format(self.seqname, self.seqlen))
+    #     return True
 
     def finalize(self, label):
         self.label = label
@@ -218,10 +224,9 @@ class Sequence(object):
     def validRow(self, r):
         if r < 0:
             return 0
-        elif r > self._nrows:
+        if r > self._nrows:
             return self._nrows
-        else:
-            return r
+        return r
 
     def findMatches(self, target):
         tl = len(target)
@@ -291,7 +296,6 @@ class Sequence(object):
         bstart = p
         mode   = "H" if openh > 0 else "N"             # H = inside hits, N = no hits
         for i in range(p, p+61):
-            openb = openh
             if i in starts:
                 openh += 1
             if i in ends:
@@ -462,8 +466,7 @@ class Sequence(object):
         win.refresh()
         if wait:
             return win.getch()
-        else:
-            return False
+        return False
         
     def askPosition(self, win):
         r = self.askInt(win, "Go to position: ")
@@ -659,7 +662,7 @@ class Driver(object):
                     S.seqname = line.rstrip("\r\n")[1:]
                     self.fastas.append(S)
                 else:
-                    S.seq += line.rstrip().upper()
+                    S.seq += line.rstrip().upper().replace("U", "T")
 
     def loadGenbank(self, filename):
         S = Sequence()
@@ -678,7 +681,7 @@ class Driver(object):
                     if line == "//":
                         self.fastas.append(S)
                         return
-                    S.seq += line[10:].rstrip().replace(" ", "").upper()    
+                    S.seq += line[10:].rstrip().replace(" ", "").upper().replace("U", "T")
 
     def displayAll(self, win):
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_YELLOW)  # search hit in seq
@@ -745,33 +748,29 @@ class Driver(object):
             elif a == ord('o'):
                 fasta.showOptions(win)
             elif a == ord(','):
-                fasta._focustype = 'h'
-                fasta._focus = fasta.prevHit()
+                fasta.setFocus('h', fasta.prevHit())
             elif a == ord('.'):
-                fasta._focus = fasta.nextHit()
-                fasta._focustype = 'h'
+                fasta.setFocus('h', fasta.nextHit())
             elif a == ord('<'):
-                fasta._focus = fasta.prevRegion()
-                fasta._focustype = 'r'
+                fasta.setFocus('r', fasta.prevRegion())
             elif a == ord('>'):
-                fasta._focus = fasta.nextRegion()
-                fasta._focustype = 'r'
+                fasta.setFocus('r', fasta.nextRegion())
             elif a == ord('a'):
-                if fasta._focus and fasta._focustype == 'h':
+                if fasta.isFocus('h'): # _focus and fasta._focustype == 'h':
                     fasta.hitToRegion(win)
                 else:
                     fasta.addRegion(win)
             elif a == ord('A'):
-                if fasta._focus and fasta._focustype == 'h':
+                if fasta.isFocus('h'): # _focus and fasta._focustype == 'h':
                     fasta.allHitsToRegions(win)
             elif a == ord('r'):
-                if fasta._focus and fasta._focustype == 'r':
+                if fasta.isFocus('r'): # _focus and fasta._focustype == 'r':
                     fasta.renameRegion(win)
             elif a == ord('c'):
-                if fasta._focus and fasta._focustype == 'r':
+                if fasta.isFocus('r'): # _focus and fasta._focustype == 'r':
                     fasta.recolorRegion(win)
             elif a == ord('d'):
-                if fasta._focus and fasta._focustype == 'r':
+                if fasta.isFocus('r'): # _focus and fasta._focustype == 'r':
                     fasta.deleteRegion(win)
             elif a == ord('D'):
                 fasta.deleteAllRegions(win)
@@ -798,14 +797,14 @@ class Driver(object):
 
     def showHelp1(self, win):
         return self.showHelpPage(win, """
-        FIAT displays one or more FASTA sequences in a terminal window. The sequence
-        is displayed across the whole height of the terminal except for the top three
-        lines (used for coordinates) and the bottom two. The last-but-one row (in
-        reverse) displays the sequence name and length, the currently visible coordinate
-        range, the number of regions and the number of hits. At the right end of the
-        line, it shows the number of the current sequence and the total number of sequences.
-        The last line (the `message' line) is used to display transient information or
-        to get use input.
+        FIAT displays one or more DNA sequences read from FASTA or Ganbank files in a 
+        terminal window. The sequence is displayed across the whole height of the 
+        terminal except for the top three lines (used for coordinates) and the bottom 
+        two. The last-but-one row (in reverse) displays the sequence name and length, 
+        the currently visible coordinate range, the number of regions and the number 
+        of hits. At the right end of the line, it shows the number of the current 
+        sequence and the total number of sequences. The last line (the `message' line) 
+        is used to display transient information or to get user input.
 
  Basic commands:
 
@@ -895,8 +894,8 @@ def usage():
 
 Usage: fiat.py fastafiles...
 
-Displays one or more sequences from FASTA files in the terminal. Allows
-scrolling through the sequence, searching for subsequences, defining
+Displays one or more sequences from FASTA or Genbank files in the terminal. 
+Allows scrolling through the sequence, searching for subsequences, defining
 arbitrary regions identified by a name and a color.
 
 Press the '?' key when displaying a sequence for detailed instructions.
