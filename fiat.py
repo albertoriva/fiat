@@ -50,10 +50,18 @@ def bmatch(b1, b2):
         return True
     return False
 
+def detectFormat(line):
+    if not line:
+        return None
+    if line[0] == '>':
+        return "fasta"
+    if line[:5] == "LOCUS":
+        return "gb"
+    return None
+
 def seqmatch(shortseq, sl, longseq, ll, p, mm=0):
     """Returns True if `shortseq' of length `sl' matches sequence `longseq' of length `ll'
 starting at position p, with at most mm mismatches."""
-    maxp = len(longseq)
     nm = 0
     for i in range(sl):
         if not bmatch(shortseq[i], longseq[p]):
@@ -79,14 +87,11 @@ def validSearchMode(sm):
     return result or "f"
 
 def decodeOrientation(o):
-    if o in ORIENTATIONS:
-        return ORIENTATIONS[o]
-    else:
-        return o
+    return ORIENTATIONS[o] if o in ORIENTATIONS else o
 
 def identity(seq):
     return seq
-    
+
 def reverseSeq(seq):
     return seq[::-1]
 
@@ -103,10 +108,7 @@ ORIENTFUNC = {'f': identity,
 
 def decodeColor(s):
     s = s.lower()
-    if s in REGCOLORS:
-        return REGCOLORS[s]
-    else:
-        return REGCOLORS['r']
+    return REGCOLORS[s] if s in REGCOLORS else REGCOLORS['r']
 
 def parseCoords(c):
     try:
@@ -168,13 +170,16 @@ class Sequence(object):
         self.fastafile = fastafile
         with open(fastafile, "r") as f:
             hdr = f.readline()
-            if hdr[0] == '>':
-                self.seqname = hdr.rstrip("\r\n")[1:]
+            (fmt, seqname) = detectFormat(hdr)
+            if fmt == 'fasta':
+                self.loadFasta(f)
+                self.seqname = seqname
+            elif fmt == 'gb':
+                self.loadGenbank(f)
+                self.seqname = seqname
             else:
                 sys.stderr.write("Malformed FASTA file - cannot load.\n")
                 return False
-            for line in f:
-                self.seq += line.rstrip().upper()
         self.seqlen = len(self.seq)
         self._nrows = 1 + self.seqlen / 60
         self.calcStats()
@@ -397,13 +402,13 @@ class Sequence(object):
             self._row += -1
 
     def pageup(self, win):
-        (h, w) = win.getmaxyx()
+        (h, _) = win.getmaxyx()
         h = h -5
         if self._row >= h:
             self._row -= h
 
     def pagedown(self, win):
-        (h, w) = win.getmaxyx()
+        (h, _) = win.getmaxyx()
         h = h - 5
         if self._row + h < self._nrows:
             self._row += h
@@ -415,7 +420,7 @@ class Sequence(object):
         self._row = self._nrows - 1
 
     def askInt(self, win, prompt):
-        (h, w) = win.getmaxyx()
+        (h, _) = win.getmaxyx()
         win.move(h-1, 0)
         win.clrtoeol()
         win.addstr(prompt, curses.A_BOLD)
@@ -432,7 +437,7 @@ class Sequence(object):
             return None
 
     def askString(self, win, prompt):
-        (h, w) = win.getmaxyx()
+        (h, _) = win.getmaxyx()
         win.move(h-1, 0)
         win.clrtoeol()
         win.addstr(prompt, curses.A_BOLD)
@@ -450,7 +455,7 @@ class Sequence(object):
         return decodeColor(col)
     
     def showMessage(self, win, message, wait=True):
-        (h, w) = win.getmaxyx()
+        (h, _) = win.getmaxyx()
         win.move(h-1, 0)
         win.clrtoeol()
         win.addstr(message, curses.A_BOLD)
@@ -493,53 +498,53 @@ class Sequence(object):
         tprob = self.sequenceProb(target)
         self.status = "Search: {} hits found (expected: {}).".format(len(self.hits), int(tprob * self.seqlen))
         
-    def nextHit(self, win):
+    def nextHit(self):
         nh = len(self.hits)
         if nh == 0:
-            return
+            return None
         self.hitidx += 1
         if self.hitidx == nh:
             self.hitidx = 0
-        return self.showHit(win, nh)
+        return self.showHit(nh)
         
-    def prevHit(self, win):
+    def prevHit(self):
         nh = len(self.hits)
         if nh == 0:
-            return
+            return None
         self.hitidx += -1
         if self.hitidx == -2:
             self.hitidx = 0
         elif self.hitidx == -1:
             self.hitidx = nh - 1
-        return self.showHit(win, nh)
+        return self.showHit(nh)
 
-    def showHit(self, win, nh):
+    def showHit(self, nh):
         hit = self.hits[self.hitidx]
         self.goto(hit.start, -1)
         self.status = "* Hit {}/{} | Position: {}-{} | Orientation: {} | (a)dd as region | (A)dd all as regions".format(self.hitidx+1, nh, hit.start, hit.end, decodeOrientation(hit.orientation))
         return hit
 
-    def nextRegion(self, win):
+    def nextRegion(self):
         nh = len(self.regions)
         if nh == 0:
-            return
+            return None
         self.regidx += 1
         if self.regidx == nh:
             self.regidx = 0
-        return self.showRegion(win, nh)
+        return self.showRegion(nh)
         
-    def prevRegion(self, win):
+    def prevRegion(self):
         nh = len(self.regions)
         if nh == 0:
-            return
+            return None
         self.regidx += -1
         if self.regidx == -2:
             self.regidx = 0
         elif self.regidx == -1:
             self.regidx = nh - 1
-        return self.showRegion(win, nh)
+        return self.showRegion(nh)
 
-    def showRegion(self, win, nh):
+    def showRegion(self, nh):
         hit = self.regions[self.regidx]
         self.goto(hit.start, -1)
         self.status = "* Region {}/{} | Position: {}-{} | Orientation: {} | (r)ename | (c)olor | (d)elete".format(self.regidx+1, nh, hit.start, hit.end, decodeOrientation(hit.orientation))
@@ -566,7 +571,7 @@ class Sequence(object):
             reg = Region(start, end, self.seq[start:end+1], color, name=regname)
             self.regions.append(reg)
 
-    def deleteRegion(self, win):
+    def deleteRegion(self):
         self.regions.remove(self._focus)
         self._focus = None
             
@@ -637,6 +642,17 @@ class Driver(object):
 
     def addSequences(self, filename):
         with open(filename, "r") as f:
+            hdr = f.readline()
+        fmt = detectFormat(hdr)
+        if fmt == 'fasta':
+            self.loadFasta(filename)
+        elif fmt == 'gb':
+            self.loadGenbank(filename)
+        else:
+            sys.stderr.write("File `{}' is not in FASTA or Genbank format - cannot load.\n")
+
+    def loadFasta(self, filename):
+        with open(filename, "r") as f:
             for line in f:
                 if line[0] == '>':
                     S = Sequence()
@@ -644,7 +660,26 @@ class Driver(object):
                     self.fastas.append(S)
                 else:
                     S.seq += line.rstrip().upper()
-        
+
+    def loadGenbank(self, filename):
+        S = Sequence()
+        state = 1
+        with open(filename, "r") as f:
+            for line in f:
+                line = line.rstrip("\r\n")
+                if state == 1:
+                    if line.startswith("ACCESSION"):
+                        S.seqname = line[12:]
+                        state = 2
+                elif state == 2:
+                    if line.startswith("ORIGIN"):
+                        state = 3
+                elif state == 3:
+                    if line == "//":
+                        self.fastas.append(S)
+                        return
+                    S.seq += line[10:].rstrip().replace(" ", "").upper()    
+
     def displayAll(self, win):
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_YELLOW)  # search hit in seq
         curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)  # search hit name
@@ -711,15 +746,15 @@ class Driver(object):
                 fasta.showOptions(win)
             elif a == ord(','):
                 fasta._focustype = 'h'
-                fasta._focus = fasta.prevHit(win)
+                fasta._focus = fasta.prevHit()
             elif a == ord('.'):
-                fasta._focus = fasta.nextHit(win)
+                fasta._focus = fasta.nextHit()
                 fasta._focustype = 'h'
             elif a == ord('<'):
-                fasta._focus = fasta.prevRegion(win)
+                fasta._focus = fasta.prevRegion()
                 fasta._focustype = 'r'
             elif a == ord('>'):
-                fasta._focus = fasta.nextRegion(win)
+                fasta._focus = fasta.nextRegion()
                 fasta._focustype = 'r'
             elif a == ord('a'):
                 if fasta._focus and fasta._focustype == 'h':
@@ -742,7 +777,7 @@ class Driver(object):
                 fasta.deleteAllRegions(win)
                     
     def showHelpPage(self, win, text, footer=None):
-        (h, w) = win.getmaxyx()
+        (h, _) = win.getmaxyx()
         win.move(0, 0)
         win.erase()
         win.addstr(1, 1, "FIAT - FASTA In A Terminal", curses.color_pair(4) + curses.A_BOLD)

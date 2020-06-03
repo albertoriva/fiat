@@ -3,7 +3,7 @@ FASTA In A Terminal
 
 ## Introduction
 
-*fiat.py* is a text-mode viewer for DNA sequences read from FASTA files.
+*fiat.py* is a text-mode viewer for DNA sequences read from FASTA/Genbank files.
 It offers a powerful search feature that allows for mismatches and ambiguous
 bases, and the ability to define regions in the sequence, characterized by
 a color and a name.
@@ -16,13 +16,12 @@ sequences at any time. Search results and regions are specific to each sequence.
 The fiat.py command line is:
 
 ```bash
-$ fiat.py fastafiles...
+$ fiat.py files...
 ```
 
-where fastafiles represents one or more files in FASTA format. Files can contain
-multiple sequences. Each sequence contained in the input files will be loaded
-into fiat. The program will then display the contents of the first loaded sequence,
-starting at position 1.
+where files represents one or more files in FASTA or Genbank format. Files in FASTA
+format can contain multiple sequences. Each sequence contained in the input files
+will be loaded into fiat. The program will then display the contents of the first loaded sequence, starting at position 1.
 
 ## Display
 
